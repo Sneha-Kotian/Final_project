@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Music Recommendation System</title>
+    <style>
+        /* General Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, #f3e6e8, #f3e8ff);
+            color: #333;
+            font-family: 'Arial', sans-serif;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            line-height: 1.6;
+            padding-top: 100px; /* Adjusted for navbar height */
+            transition: background 0.3s ease, color 0.3s ease;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        h1 {
+            font-size: 3rem;
+            color: #4b6584;
+        }
+
+        /* Navbar */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-color: #4b6584;
+            padding: 15px 0;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+        }
+
+        nav a {
+            color: white;
+            padding: 12px 25px;
+            text-decoration: none;
+            font-size: 1.1rem;
+            margin: 0 15px;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+
+        nav a:hover {
+            background-color: #34495e;
+        }
+
+        /* Dark Mode Styling */
+        .dark {
+            background: #2f2f2f;
+            color: #f4f4f4;
+        }
+
+        .dark nav {
+            background-color: #333;
+        }
+
+        .dark button {
+            background-color: #333;
+        }
+
+        /* About Us Section */
+        #about {
+            padding: 60px 20px;
+            background: #f9f9f9;
+            text-align: center;
+        }
+
+        #about h2 {
+            font-size: 2rem;
+            margin-bottom: 20px;
+        }
+
+        #about p {
+            font-size: 1.1rem;
+            max-width: 800px;
+            margin: 0 auto 20px;
+        }
+
+        /* Container */
+        .container {
+            width: 90%;
+            max-width: 900px;
+            margin: 0 auto;
+            background: #fff;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Form Styling */
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        select {
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-size: 1rem;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        input[type="text"]:focus,
+        input[type="number"]:focus,
+        select:focus {
+            border-color: #4b6584;
+            outline: none;
+        }
+
+        /* Button */
+        button.btn {
+            background-color: #4b6584;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background-color 0.3s;
+        }
+
+        button.btn:hover {
+            background-color: #34495e;
+        }
+
+        /* Recommendations Section */
+        .recommendations {
+            margin-top: 30px;
+        }
+
+        .recommendations h3 {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            color: #4b6584;
+        }
+
+        .recommendation-item {
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #f9f9f9;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+        }
+
+        .recommendation-item img {
+            width: 70px;
+            height: 70px;
+            margin-right: 20px;
+            border-radius: 8px;
+        }
+
+        .recommendation-item strong {
+            font-weight: bold;
+        }
+
+        /* Footer */
+        footer {
+            background: #4b6584;
+            color: white;
+            text-align: center;
+            padding: 15px 0;
+            margin-top: auto;
+        }
+
+        footer p {
+            font-size: 0.9rem;
+        }
+
+        /* Dark Mode Toggle Button */
+        .dark-mode-toggle {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            background-color: #4b6584;
+            color: white;
+            border: none;
+            padding: 12px 15px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1.3rem;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+        }
+
+        .dark-mode-toggle:hover {
+            background-color: #34495e;
+            transform: scale(1.1);
+        }
+    </style>
+</head>
+<body>
+<!-- Dark Mode Toggle Button -->
+<button class="dark-mode-toggle" onclick="toggleDarkMode()">🌙</button>
+
+<!-- Navbar -->
+<nav>
+    <a href="#home" onclick="scrollToTop()">Home</a>
+    <a href="#about">About Us</a>
+</nav>
+
+<header>
+    <h1>🎶 Music Recommendation System 🎶</h1>
+</header>
+
+<div class="container">
+    <form id="recommendationForm">
+        <div class="form-group">
+            <label for="song_name">Choose a Song:</label>
+            <input type="text" id="song_name" name="song_name" autocomplete="off" oninput="showSuggestions(this.value)">
+            <div id="songSuggestions"></div>
+        </div>
+
+        <div class="form-group">
+            <label for="genre">Choose a Genre:</label>
+            <select id="genre" name="genre">
+                <option value="All">All</option>
+                {% for genre in genres %}
+                    <option value="{{ genre }}">{{ genre.replace('_', ' ') }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="top_n">Number of Recommendations:</label>
+            <input type="number" id="top_n" name="top_n" min="1" max="10" value="5">
+        </div>
+
+        <button type="submit" class="btn">Get Recommendations</button>
+    </form>
+
+    <div class="recommendations" id="recommendations"></div>
+</div>
+
+<!-- About Us Section -->
+<div id="about">
+    <h2>About Us</h2>
+    <p>Welcome to the Music Recommendation System! This website is designed to help you discover new songs based on your preferences.</p>
+    <p>To use the system, follow these steps:</p>
+    <ul>
+        <li>Type the name of a song you enjoy in the "Choose a Song" field.</li>
+        <li>Select a genre from the "Choose a Genre" dropdown (optional, you can choose "All" to ignore this filter).</li>
+        <li>Choose the number of recommendations you'd like to receive (default is 5).</li>
+        <li>Click on "Get Recommendations" to see your suggestions!</li>
+    </ul>
+</div>
+
+<footer>
+    <p>&copy; 2025 Music Recommendation System by SnehApeksha</p>
+</footer>
+
+<script>
+
+function toggleDarkMode() {
+    document.body.classList.toggle('dark');
+}
+
+function showSuggestions(query) {
+    const suggestionsDiv = document.getElementById("songSuggestions");
+    if (!query) {
+        suggestionsDiv.style.display = "none";
+        return;
+    }
+
+    const allSongs = JSON.parse('{{ songstojson|safe }}');
+    const matchedSongs = allSongs?.filter(song => song.toLowerCase().includes(query.toLowerCase())) || [];
+
+    suggestionsDiv.innerHTML = matchedSongs.map(song => `
+        <div class="suggestion-item" onclick="selectSong('${song}')">${song}</div>
+    `).join('');
+    suggestionsDiv.style.display = matchedSongs.length ? "block" : "none";
+}
+
+function selectSong(song) {
+    document.getElementById("song_name").value = song;
+    document.getElementById("songSuggestions").style.display = "none";
+}
+
+
+function scrollToTop() {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+document.getElementById('recommendationForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const formData = new FormData(e.target);
+
+    const response = await fetch('/recommend', {
+        method: 'POST',
+        body: formData
+    });
+
+    if (response.ok) {
+        const recommendations = await response.json();
+        const recommendationsDiv = document.getElementById('recommendations');
+        
+        if (recommendations.length > 0) {
+            recommendationsDiv.innerHTML = recommendations.map(item => `
+                <div class="recommendation-item">
+                    <img src="${item.thumbnail_link}" alt="${item.song_name}" />
+                    <p><strong>${item.song_name}</strong> by ${item.artist_name}</p>
+                    <a href="${item.spotify_track_link}" target="_blank">Listen on Spotify</a>
+                </div>
+            `).join('');
+        } else {
+            recommendationsDiv.innerHTML = 'No recommendations found.';
+        }
+    } else {
+        console.log('Error fetching recommendations:', response);
+    }
+});
+</script>
+</body>
+</html>
